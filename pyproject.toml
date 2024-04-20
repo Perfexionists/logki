@@ -60,9 +60,6 @@ logki = "logki.logki:launch"
 # Mypy configuration
 # ----------------------
 [tool.mypy]
-plugins = [
-    "numpy.typing.mypy_plugin"
-]
 exclude = [
     ".git",
     ".mypy_cache",
