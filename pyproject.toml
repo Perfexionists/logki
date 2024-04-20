@@ -39,7 +39,7 @@ dependencies = [
     # Plotting / visualization / output
     "tabulate>=0.9",
 ]
-dynamic = ["version"]
+version = "1.0.1"
 
 [project.optional-dependencies]
 docs = [

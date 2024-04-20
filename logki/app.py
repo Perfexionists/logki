@@ -20,7 +20,7 @@ from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import TextArea, Frame
 
 
-__VERSION__ = "1.0"
+__VERSION__ = "1.0.0"
 NS_TO_MS = 1000000
 
 
