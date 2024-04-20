@@ -8,7 +8,7 @@ from prompt_toolkit.input import create_pipe_input
 from prompt_toolkit.output import DummyOutput
 
 # Logki imports
-import logki.logki as logki
+import logki.app as logki
 
 
 def test_app():

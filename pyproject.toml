@@ -55,7 +55,7 @@ Repository = "https://github.com/Perfexionists/logki.git"
 Changelog = "https://github.com/Perfexionists/logki/blob/master/CHANGELOG.rst"
 
 [project.scripts]
-logki = "logki.logki:launch"
+logki = "logki.app:launch"
 
 # Mypy configuration
 # ----------------------
