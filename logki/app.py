@@ -19,8 +19,10 @@ from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import TextArea, Frame
 
+# Logki imports
+import logki
 
-__VERSION__ = "1.0.0"
+
 NS_TO_MS = 1000000
 
 
@@ -410,7 +412,7 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
 def launch():
     """Launches logki"""
     if len(sys.argv) == 2 and sys.argv[1] == '--version':
-        print(__VERSION__)
+        print(f"logki {logki.__version__}")
         sys.exit(0)
     elif len(sys.argv) == 2:
         with BufferedLog(sys.argv[1]) as buffered_log:
