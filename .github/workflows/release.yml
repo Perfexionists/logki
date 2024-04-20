@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install logki(to assure it is correctly installed) and try obtaining the version
+      - name: Install logki (to assure it is correctly installed) and try obtaining the version
         run: |
           make install
           logki --version

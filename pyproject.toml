@@ -7,6 +7,19 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 py-modules = ['logki']
+package-dir = {'logki' = 'logki'}
+
+[tool.setuptools.packages.find]
+where = ['.']
+include = [
+    'logki',
+    'logki*'
+]
+namespaces = true
+
+[tool.setuptools.package-data]
+logki = [
+]
 
 [project]
 name = "logki"
