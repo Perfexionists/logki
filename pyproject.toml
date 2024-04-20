@@ -1,0 +1,111 @@
+[build-system]
+requires = [
+    "setuptools >= 40.6.0",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logki"
+description = "logki: Log Analysis Kit"
+requires-python = ">=3.9"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    {name = "Tomas Fiedor", email = "TomasFiedor@gmail.com"},
+]
+dependencies = [
+    # Build
+
+    # Other
+    "prompt_toolkit>=3.0.43",
+
+    # Plotting / visualization / output
+    "tabulate>=0.9",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+docs = [
+    # Sphinx 7.2 dropped support for Python 3.8
+    "Sphinx>=7.1",
+    "sphinx-click>=5.0",
+]
+lint = [
+    "black>=22.1.0",
+    "pylint>=2.17",
+]
+test = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "tox>=4.9.0",
+]
+typing = [
+    "mypy>=1.5",
+    "mypy-extensions>=1.0",
+    "typing-extensions>=4.7",
+    "types-tabulate>=0.9",
+]
+
+[project.urls]
+Repository = "https://github.com/Perfexionists/logki.git"
+Changelog = "https://github.com/Perfexionists/logki/blob/master/CHANGELOG.rst"
+
+[project.scripts]
+logki = "logki.logki:launch"
+
+# Mypy configuration
+# ----------------------
+[tool.mypy]
+plugins = [
+    "numpy.typing.mypy_plugin"
+]
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".tox",
+    "build",
+    "docs",
+    "logki.egg-info",
+    "venv",
+]
+disallow_incomplete_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+no_implicit_reexport = true
+strict_equality = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+# Pytest configuration
+# --------------------
+[tool.pytest.ini_options]
+addopts = "-p no:warnings -p no:logging"
+norecursedirs = [
+    "case-studies",
+    "venv",
+    "docs",
+    "*.egg-info",
+    ".git",
+    ".tox",
+    "build",
+    ".mypy_cache",
+]
+
+# Coverage configuration
+# ----------------------
+[tool.coverage.run]
+source = [
+    "logki",
+]
+
+# Formatting configuration
+# ----------------------
+[tool.black]
+target-version = [
+    "py39",
+    "py310",
+    "py311"
+]
+line-length = 100

@@ -1,0 +1,36 @@
+Contributing
+============
+
+In case you run into some unexpected behaviour, error or anything suspicious, either contact us
+directly through mail or [create a new Issue](https://github.com/Perfexionists/logki/issues/new).
+
+If you'd like to contribute, please first fork our repository and create a new dedicated feature branch starting from
+the `develop`  branch. Pull requests are warmly welcome! We will surely review the contribution (possibly request
+some changes). However, please follow these guidelines:
+
+  1. **Document your code properly**---refer to 
+  [sphinx documentation](http://www.sphinx-doc.org/en/stable/domains.html#the-python-domain) 
+  for the format compatible with our documentation.
+  
+  2. **Test your code** within reasonable code coverage. The tests should be in the
+  <https://github.com/Perfexionists/logki/tree/develop/tests> directory and should achieve a suitable
+  amount of codecov coverage.
+  
+  3. **Follow the project formatting**; we recommend using the [black](https://github.com/psf/black) formatter.
+  
+  4. **Commit properly**: write meaningful commit messages; we recommend to write first short line as a short
+  description that can be included into the following template: "This commit will ___".
+
+Before considering a merge of pull requests we want the feature branch to fulfill the following:
+
+  1. The branch must be compilable (i.e. Github Action checks are passing);
+  2. The tests cover reasonable proportion of code (i.e. codecov checks are passing);
+  3. The code has no issues checked by codacy;
+  4. At least one of the major maintainers has reviewed the code.
+
+If you think your extension could help others, please [send us
+PR](https://github.com/Perfexionists/logki/pull/new/develop), we will review the code and in case it is,
+indeed, suitable for wider audience and maintainable, we will include it in our
+[upstream](https://github.com/Perfexionists/logki).
+
+*But, please be understanding; we cannot fix and merge everything.*
