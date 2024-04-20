@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 # Standard Imports
-from typing import Optional, TextIO
+from typing import Optional, TextIO, Any
 from dataclasses import dataclass
 import io
 import sys
@@ -58,6 +58,7 @@ class BufferedLog:
 
     def __exit__(self, exc_type: type, exc_val: Exception, exc_tb: BaseException) -> None:
         """Closes the file"""
+        assert self.file is not None
         self.file.close()
 
     def read_next_line(self) -> str:
@@ -65,6 +66,7 @@ class BufferedLog:
 
         :return: next line in the buffer
         """
+        assert self.file is not None
         if self.current_position >= self.end_position:
             return ""
         self.file.seek(self.current_position)
@@ -77,6 +79,7 @@ class BufferedLog:
 
         :return: previous line in the buffer
         """
+        assert self.file is not None
         block = ""
         while self.current_position > 0:
             to_read = min(self.block_size, self.current_position)
@@ -98,6 +101,7 @@ class BufferedLog:
     def get_current_position(self) -> int:
         """Returns the current position in the log
         """
+        assert self.file is not None
         return self.file.tell()
 
     def move_current_position(self, position: int) -> None:
@@ -105,11 +109,13 @@ class BufferedLog:
 
         :param position: new position in the log
         """
+        assert self.file is not None
         self.current_position = position
         self.file.seek(position)
 
     def close(self):
         """Closes the buffered log"""
+        assert self.file is not None
         self.file.close()
 
 
@@ -168,14 +174,14 @@ class State:
     :ivar first_timestamp: first timestamp in the log
     :ivar stack: stack of the calls
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.current_line: int = 0  # Tracks the currently highlighted line
         self.real_line: int = 0
         self.buffered_log: Optional[BufferedLog] = None
-        self.last_command = ""
-        self.current_timestamp = 0
-        self.first_timestamp = 0
-        self.stack = []
+        self.last_command: str = ""
+        self.current_timestamp: int = 0
+        self.first_timestamp : int= 0
+        self.stack: list[str] = []
 
         self._log_content: list[str] = []
         self._buffer_positions: list[int] = []
@@ -187,12 +193,12 @@ class State:
         """Returns current content of the log"""
         return self._log_content
 
-    def init_buffer(self, buffered_log: BufferedLog):
+    def init_buffer(self, buffered_log: BufferedLog) -> None:
         """Initializes the buffer from buffered log.
 
         :param buffered_log: buffered log
         """
-        self.buffered_log: BufferedLog = buffered_log
+        self.buffered_log = buffered_log
         self._buffer_log_start = 0
         for i in range(0, self._buffer_size):
             self._log_content.append(self.buffered_log.read_next_line())
@@ -203,6 +209,7 @@ class State:
 
     def move_window_forward(self) -> None:
         """Moves window forward by one line"""
+        assert self.buffered_log is not None
         self.real_line += 1
         if self.current_line <= (self._buffer_size - 6):
             self.current_line = min(self.current_line + 1, self._buffer_size)
@@ -219,6 +226,7 @@ class State:
 
     def move_window_backward(self) -> None:
         """Moves window back by one line"""
+        assert self.buffered_log is not None
         self.real_line = max(self.real_line - 1, 0)
         if self.current_line > 5 or self.real_line <= 5:
             self.current_line = max(self.current_line - 1, 0)
@@ -327,7 +335,7 @@ def get_stack() -> list[tuple[str, str]]:
     return lines
 
 
-def create_app(buffered_log: BufferedLog) -> Application:
+def create_app(buffered_log: BufferedLog) -> Application[Any]:
     """Creates apllication for given buffered log
 
     :param buffered_log: buffered log
@@ -393,7 +401,7 @@ def create_app(buffered_log: BufferedLog) -> Application:
     )
 
     # Create the application
-    app = Application(
+    app: Application[Any] = Application(
         layout=Layout(root_container), key_bindings=bindings, style=style, full_screen=True
     )
     return app
