@@ -1,4 +1,4 @@
-# logki: Lightweight Performance Version System
+# logki: Log Analysis Toolkit
 
 [![build status](https://github.com/Perfexionists/logki/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/Perfexionists/logki/actions)
 [![codecov](https://codecov.io/gh/Perfexionists/logki/graph/badge.svg?token=3x4Luodr84)](https://codecov.io/gh/Perfexionists/logki)
