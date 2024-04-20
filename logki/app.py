@@ -401,14 +401,16 @@ def create_app(buffered_log: BufferedLog) -> Application:
 
 def launch():
     """Launches logki"""
-    if len(sys.argv) != 2:
+    if len(sys.argv) == 2 and sys.argv[1] == '--version':
+        print(__VERSION__)
+        sys.exit(0)
+    elif len(sys.argv) == 2:
+        with BufferedLog(sys.argv[1]) as buffered_log:
+            application = create_app(buffered_log)
+            application.run()
+    else:
         print("usage: ./logki.py <LOG>.log")
         sys.exit(1)
-    elif len(sys.argv) == 1 and sys.argv[1] == '--version':
-        print(__VERSION__)
-    with BufferedLog(sys.argv[1]) as buffered_log:
-        application = create_app(buffered_log)
-        application.run()
 
 
 if __name__ == "__main__":
