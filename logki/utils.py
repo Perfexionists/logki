@@ -19,6 +19,8 @@ class BufferedLog:
     :ivar end_position: last position in the file
     :ivar file: opened file
     """
+    BEGINNING: str = "[BEGIN]"
+    END: str = "[END]"
 
     def __init__(self, file_path: str, block_size: int = 1024):
         """Initializes the buffered log
@@ -55,7 +57,7 @@ class BufferedLog:
         """
         assert self.file is not None
         if self.current_position >= self.end_position:
-            return ""
+            return BufferedLog.END
         self.file.seek(self.current_position)
         line = self.file.readline()
         self.current_position = self.file.tell()
@@ -67,6 +69,7 @@ class BufferedLog:
         :return: previous line in the buffer
         """
         assert self.file is not None
+
         block = ""
         while self.current_position > 0:
             to_read = min(self.block_size, self.current_position)
@@ -84,6 +87,11 @@ class BufferedLog:
                 self.file.seek(self.current_position)
                 return last_full_line.strip()
         return block.strip()
+
+    def is_at_end(self) -> bool:
+        """Returns whether the buffer is at the end of the file"""
+        assert self.file is not None
+        return self.current_position == self.end_position
 
     def get_current_position(self) -> int:
         """Returns the current position in the log"""

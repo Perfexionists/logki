@@ -85,7 +85,7 @@ class State:
         for _ in range(0, self._buffer_size):
             self._log_content.append(self.buffered_log.read_next_line())
             self._buffer_positions.append(self.buffered_log.get_current_position())
-        self.first_timestamp = int(self._log_content[0].split(":")[0])
+        self.first_timestamp = int(self._log_content[1].split(":")[0])
         self.current_timestamp = self.first_timestamp
         self._buffer_log_end = self.buffered_log.get_current_position()
 
@@ -93,7 +93,7 @@ class State:
         """Moves window forward by one line"""
         assert self.buffered_log is not None
         self.real_line += 1
-        if self.current_line <= (self._buffer_size - 6):
+        if self.current_line <= (self._buffer_size - 6) or self.buffered_log.is_at_end():
             self.current_line = min(self.current_line + 1, self._buffer_size)
             return
 

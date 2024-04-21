@@ -120,6 +120,7 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
     def process_command(buff):
         current_state: State = State()
         try:
+            set_status("")
             cmd = buff.text.strip().lower()
 
             if cmd == "":
@@ -128,11 +129,17 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
             if cmd == "help":
                 terminal.text = "Commands: help, next, prev"
             elif cmd in ("next", "n", "j"):
-                current_state.process_event()
-                current_state.move_window_forward()
+                if current_state.buffered_log.is_at_end() and current_state.current_line == current_state._buffer_size:
+                    set_status("On the end of the file")
+                else:
+                    current_state.process_event()
+                    current_state.move_window_forward()
             elif cmd in ("prev", "p", "k"):
-                current_state.move_window_backward()
-                current_state.undo_event()
+                if current_state.real_line == 0:
+                    set_status("On the start of the file")
+                else:
+                    current_state.move_window_backward()
+                    current_state.undo_event()
             elif cmd in ("quit", "exit", "q"):
                 app.exit()
             else:
@@ -141,7 +148,6 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
             # Refresh log view to reflect changes
             log_view.content = FormattedTextControl(get_colored_log)
             buff.document = Document()  # Clear the terminal input after command execution
-            set_status(f"last command: {cmd}")
             return True
         except Exception as exc:
             set_status(f"error: {exc}")
