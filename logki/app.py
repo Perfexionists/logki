@@ -30,12 +30,14 @@ def get_colored_log() -> list[tuple[str, str]]:
     """Returns coloured contents"""
     current_state: State = State()
     styled_lines = []
+    lineno_width = len(str(current_state.real_line - current_state.current_line + current_state._buffer_size))
     for i, line in enumerate(current_state.get_content()):
+        lineno = current_state.real_line - current_state.current_line + i + 1
         if i == current_state.current_line:
             # Apply a different background for the current line
-            styled_lines.extend([("class:current_line", line + "\n")])
+            styled_lines.extend([("class:current_line", f"{lineno: >{lineno_width}}| {line}" + "\n")])
         else:
-            styled_lines.extend(get_colored_log_line(line) + [("", "\n")])
+            styled_lines.extend([("class:text", f"{lineno: >{lineno_width}}| ")] + get_colored_log_line(line) + [("", "\n")])
     return styled_lines
 
 
@@ -58,7 +60,7 @@ def get_colored_log_line(line: str) -> list[tuple[str, str]]:
             (f"class:{event.event}", event.event),
         ]
     except IndexError:
-        return [("class:skip", f"(skipped) {line}")]
+        return [("class:skip", line)]
 
 
 # Key bindings for the application

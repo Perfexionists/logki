@@ -67,7 +67,7 @@ class State:
 
         self._log_content: list[str] = []
         self._buffer_positions: list[int] = []
-        self._buffer_size: int = 20
+        self._buffer_size: int = 22
         self._buffer_log_start: int = 0
         self._buffer_log_end: int = 0
 
