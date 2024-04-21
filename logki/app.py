@@ -22,7 +22,6 @@ from prompt_toolkit.widgets import TextArea, Frame
 # Logki imports
 import logki
 
-
 NS_TO_MS = 1000000
 
 
@@ -35,6 +34,7 @@ class BufferedLog:
     :ivar end_position: last position in the file
     :ivar file: opened file
     """
+
     def __init__(self, file_path: str, block_size: int = 1024):
         """Initializes the buffered log
 
@@ -101,8 +101,7 @@ class BufferedLog:
         return block.strip()
 
     def get_current_position(self) -> int:
-        """Returns the current position in the log
-        """
+        """Returns the current position in the log"""
         assert self.file is not None
         return self.file.tell()
 
@@ -131,6 +130,7 @@ class Event:
     :ivar pid: process id
     :ivar uid: uid of the event (function)
     """
+
     timestamp: int
     event: str
     tid: int
@@ -146,7 +146,7 @@ class Event:
         """
         parts = line.split(":")
         ts, evt = parts[0], parts[-1]
-        middle_parts = parts[2].split(')(')
+        middle_parts = parts[2].split(")(")
         tid, pid, uid = middle_parts[0], parts[1][1:], middle_parts[1][:-1]
         return Event(int(ts), evt, int(tid), int(pid), uid)
 
@@ -176,13 +176,14 @@ class State:
     :ivar first_timestamp: first timestamp in the log
     :ivar stack: stack of the calls
     """
+
     def __init__(self) -> None:
         self.current_line: int = 0  # Tracks the currently highlighted line
         self.real_line: int = 0
         self.buffered_log: Optional[BufferedLog] = None
         self.last_command: str = ""
         self.current_timestamp: int = 0
-        self.first_timestamp : int= 0
+        self.first_timestamp: int = 0
         self.stack: list[str] = []
 
         self._log_content: list[str] = []
@@ -327,9 +328,13 @@ def get_stats() -> str:
     current_state: State = State()
     data = [
         ["current event", f"{current_state.real_line}"],
-        ["current time", f"{format_time(current_state.current_timestamp - current_state.first_timestamp)}"],
+        [
+            "current time",
+            f"{format_time(current_state.current_timestamp - current_state.first_timestamp)}",
+        ],
     ]
     return tabulate.tabulate(data, headers=[], tablefmt="presto")
+
 
 def get_stack() -> list[tuple[str, str]]:
     """Returns formatted stack"""
@@ -387,6 +392,7 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
     )
     status_text = TextArea(text="", height=1, multiline=False)
     status_view = Frame(title="Status", body=status_text)
+
     def set_status(status: str) -> None:
         """Returns statistics for current state"""
         status_text.buffer.document = Document(text=status)
@@ -419,14 +425,17 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
 
     # Create the application
     app: Application[Any] = Application(
-        layout=Layout(root_container, focused_element=terminal), key_bindings=bindings, style=style, full_screen=True
+        layout=Layout(root_container, focused_element=terminal),
+        key_bindings=bindings,
+        style=style,
+        full_screen=True,
     )
     return app
 
 
 def launch():
     """Launches logki"""
-    if len(sys.argv) == 2 and sys.argv[1] == '--version':
+    if len(sys.argv) == 2 and sys.argv[1] == "--version":
         print(f"logki {logki.__version__}")
         sys.exit(0)
     elif len(sys.argv) == 2:
