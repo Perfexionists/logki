@@ -187,7 +187,7 @@ class State:
 
         self._log_content: list[str] = []
         self._buffer_positions: list[int] = []
-        self._buffer_size: int = 25
+        self._buffer_size: int = 20
         self._buffer_log_start: int = 0
         self._buffer_log_end: int = 0
 
@@ -202,7 +202,7 @@ class State:
         """
         self.buffered_log = buffered_log
         self._buffer_log_start = 0
-        for i in range(0, self._buffer_size):
+        for _ in range(0, self._buffer_size):
             self._log_content.append(self.buffered_log.read_next_line())
             self._buffer_positions.append(self.buffered_log.get_current_position())
         self.first_timestamp = int(self._log_content[0].split(":")[0])
@@ -281,18 +281,21 @@ def get_colored_log_line(line: str) -> list[tuple[str, str]]:
 
     :param line: current line
     """
-    event = Event.from_line(line)
-    return [
-        ("class:timestamp", str(event.timestamp)),
-        ("class:text", ":("),
-        ("class:pid", str(event.pid)),
-        ("class:text", ":"),
-        ("class:tid", str(event.tid)),
-        ("class:text", ")("),
-        ("class:function", event.uid),
-        ("class:text", "):"),
-        (f"class:{event.event}", event.event),
-    ]
+    try:
+        event = Event.from_line(line)
+        return [
+            ("class:timestamp", str(event.timestamp)),
+            ("class:text", ":("),
+            ("class:pid", str(event.pid)),
+            ("class:text", ":"),
+            ("class:tid", str(event.tid)),
+            ("class:text", ")("),
+            ("class:function", event.uid),
+            ("class:text", "):"),
+            (f"class:{event.event}", event.event),
+        ]
+    except IndexError:
+        return [("class:skip", f"(skipped) {line}")]
 
 
 # Key bindings for the application
@@ -347,28 +350,32 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
 
     def process_command(buff):
         current_state: State = State()
-        cmd = buff.text.strip().lower()
+        try:
+            cmd = buff.text.strip().lower()
 
-        if cmd == "":
-            cmd = current_state.last_command
+            if cmd == "":
+                cmd = current_state.last_command
 
-        if cmd == "help":
-            terminal.text = "Commands: help, next, prev"
-        elif cmd in ("next", "n", "j"):
-            current_state.process_event()
-            current_state.move_window_forward()
-        elif cmd in ("prev", "p", "k"):
-            current_state.move_window_backward()
-            current_state.undo_event()
-        elif cmd in ("quit", "exit", "q"):
-            app.exit()
-        else:
-            terminal.text = f"Unknown command: {cmd}"
-        current_state.last_command = cmd
-        # Refresh log view to reflect changes
-        log_view.content = FormattedTextControl(get_colored_log)
-        buff.document = Document()  # Clear the terminal input after command execution
-        return True
+            if cmd == "help":
+                terminal.text = "Commands: help, next, prev"
+            elif cmd in ("next", "n", "j"):
+                current_state.process_event()
+                current_state.move_window_forward()
+            elif cmd in ("prev", "p", "k"):
+                current_state.move_window_backward()
+                current_state.undo_event()
+            elif cmd in ("quit", "exit", "q"):
+                app.exit()
+            else:
+                terminal.text = f"Unknown command: {cmd}"
+            current_state.last_command = cmd
+            # Refresh log view to reflect changes
+            log_view.content = FormattedTextControl(get_colored_log)
+            buff.document = Document()  # Clear the terminal input after command execution
+            set_status(f"last command: {cmd}")
+            return True
+        except Exception as exc:
+            set_status(f"error: {exc}")
 
     # Define the layout
     stack_view = Frame(title="Stack", body=Window(content=FormattedTextControl(get_stack)))
@@ -378,12 +385,19 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
         title="State",
         body=HSplit([stack_view, counter_view]),
     )
+    status_text = TextArea(text="", height=1, multiline=False)
+    status_view = Frame(title="Status", body=status_text)
+    def set_status(status: str) -> None:
+        """Returns statistics for current state"""
+        status_text.buffer.document = Document(text=status)
+
     terminal = TextArea(
         prompt="> ", multiline=False, wrap_lines=False, accept_handler=process_command
     )
     root_container = HSplit(
         [
             VSplit([log_view, state_view]),
+            status_view,
             terminal,
         ]
     )
@@ -391,6 +405,7 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
     # Define styles
     style = Style(
         [
+            ("skip", "#b4b4b8"),
             ("timestamp", "#ff595e"),
             ("tid", "#ff924c"),
             ("pid", "#ffca3a"),
@@ -404,7 +419,7 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
 
     # Create the application
     app: Application[Any] = Application(
-        layout=Layout(root_container), key_bindings=bindings, style=style, full_screen=True
+        layout=Layout(root_container, focused_element=terminal), key_bindings=bindings, style=style, full_screen=True
     )
     return app
 
