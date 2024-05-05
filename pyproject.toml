@@ -39,7 +39,7 @@ dependencies = [
     # Plotting / visualization / output
     "tabulate>=0.9",
 ]
-version = "1.0.2"
+version = "1.0.3"
 
 [project.optional-dependencies]
 docs = [
