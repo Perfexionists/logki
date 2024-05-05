@@ -71,6 +71,14 @@ class State:
         self._buffer_log_start: int = 0
         self._buffer_log_end: int = 0
 
+    def get_beginning_of_log(self, size=80) -> str:
+        """Returns beginning line for stream"""
+        return self.buffered_log.file_path.center(size, "_")
+
+    def get_end_of_log(self, size=80) -> str:
+        """Returns beginning line for stream"""
+        return "EOF".center(size, "▔")
+
     def get_content(self) -> list[str]:
         """Returns current content of the log"""
         return self._log_content
@@ -82,8 +90,10 @@ class State:
         """
         self.buffered_log = buffered_log
         self._buffer_log_start = 0
-        for _ in range(0, self._buffer_size):
-            self._log_content.append(self.buffered_log.read_next_line())
+        self._log_content.append(self.get_beginning_of_log())
+        self._buffer_positions.append(0)
+        for _ in range(0, self._buffer_size - 1):
+            self._log_content.append(self.buffered_log.read_next_line().strip())
             self._buffer_positions.append(self.buffered_log.get_current_position())
         self.first_timestamp = int(self._log_content[1].split(":")[0])
         self.current_timestamp = self.first_timestamp
@@ -93,14 +103,17 @@ class State:
         """Moves window forward by one line"""
         assert self.buffered_log is not None
         self.real_line += 1
-        if self.current_line <= (self._buffer_size - 6) or self.buffered_log.is_at_end():
+        if self.current_line <= (self._buffer_size - 6) or self.get_end_of_log() in self._log_content:
             self.current_line = min(self.current_line + 1, self._buffer_size)
             return
 
         self._log_content = self._log_content[1:]
         self.buffered_log.move_current_position(self._buffer_log_end)
-        line = self.buffered_log.read_next_line()
-        self._log_content.append(line)
+        if self.buffered_log.is_at_end():
+            line = self.get_end_of_log()
+        else:
+            line = self.buffered_log.read_next_line()
+        self._log_content.append(line.strip())
 
         self._buffer_log_start = self._buffer_positions[0]
         self._buffer_log_end = self.buffered_log.get_current_position()
@@ -110,16 +123,20 @@ class State:
         """Moves window back by one line"""
         assert self.buffered_log is not None
         self.real_line = max(self.real_line - 1, 0)
-        if self.current_line > 5 or self.real_line <= 5:
+        if self.current_line > 5 or self.get_beginning_of_log() in self._log_content:
             self.current_line = max(self.current_line - 1, 0)
             return
 
         self._log_content = self._log_content[:-1]
         self.buffered_log.move_current_position(self._buffer_log_start)
-        line = self.buffered_log.read_previous_line()
-        self._log_content = [line] + self._log_content
 
-        self._buffer_log_start = self.buffered_log.get_current_position() - len(line) + 1
+        if self.buffered_log.get_current_position() == 0:
+            line = self.get_beginning_of_log()
+        else:
+            line = self.buffered_log.read_previous_line()
+        self._log_content = [line.strip()] + self._log_content
+
+        self._buffer_log_start = self.buffered_log.get_current_position()
         self._buffer_log_end = self._buffer_positions[-1]
         self._buffer_positions = [self._buffer_log_start] + self._buffer_positions[:-1]
 
