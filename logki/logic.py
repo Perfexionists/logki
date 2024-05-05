@@ -71,11 +71,12 @@ class State:
         self._buffer_log_start: int = 0
         self._buffer_log_end: int = 0
 
-    def get_beginning_of_log(self, size=80) -> str:
+    def get_beginning_of_log(self, size: int = 80) -> str:
         """Returns beginning line for stream"""
+        assert self.buffered_log is not None
         return self.buffered_log.file_path.center(size, "_")
 
-    def get_end_of_log(self, size=80) -> str:
+    def get_end_of_log(self, size: int = 80) -> str:
         """Returns beginning line for stream"""
         return "EOF".center(size, "▔")
 
