@@ -126,6 +126,7 @@ def singleton_class(cls):
 
 
 class Command(Enum):
+    Error = -1
     Next = 0
     Prev = 1
     Quit = 2

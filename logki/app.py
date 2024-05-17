@@ -170,7 +170,7 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
             elif cmd == Command.Quit:
                 app.exit()
             else:
-                set_status(f"Unknown or unsupported command: {cmd}")
+                set_status(f"Unknown or unsupported command: {cmd} ({inp})")
             # Refresh log view to reflect changes
             log_view.content = FormattedTextControl(get_colored_log)
             buff.document = Document()  # Clear the terminal input after command execution
