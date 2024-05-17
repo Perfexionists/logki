@@ -146,10 +146,7 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
             if cmd == Command.Help:
                 terminal.text = "Commands: help, next, prev"
             elif cmd == Command.Next:
-                if (
-                    current_state.buffered_log.is_at_end()
-                    and current_state.current_line == current_state._buffer_size
-                ):
+                if current_state.is_at_the_end():
                     set_status("On the end of the file")
                 else:
                     if current_state.real_line != 0:
@@ -161,12 +158,19 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
                     set_status("On the start of the file")
                 else:
                     current_state.move_window_backward()
-                    if (
-                        not current_state.buffered_log.is_at_end()
-                        or current_state.current_line != current_state._buffer_size
-                    ):
+                    if current_state.is_not_at_the_beginning():
                         current_state.undo_event()
                 current_state.last_command = Command.Prev
+            elif cmd == Command.Track:
+                pass
+            elif cmd == Command.Verify:
+                pass
+            elif cmd == Command.Disprove:
+                pass
+            elif cmd == Command.BreakOn:
+                pass
+            elif cmd == Command.Print:
+                set_status(command_parser.command_evaluation.print_statement)
             elif cmd == Command.Quit:
                 app.exit()
             else:

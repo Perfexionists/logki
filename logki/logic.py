@@ -162,3 +162,11 @@ class State:
             self.stack.pop()
         else:
             self.stack.append(event.uid)
+
+    def is_at_the_end(self) -> bool:
+        """Returns whether we are at the end of the buffer"""
+        return self.buffered_log.is_at_end() and self.current_line == self._buffer_size
+
+    def is_not_at_the_beginning(self) -> bool:
+        """Returns whether we are at the beginning of the buffer"""
+        return not self.buffered_log.is_at_end() or self.current_line != self._buffer_size
