@@ -1,4 +1,5 @@
 """logki is prompt script for going through the logs, for example of perun ktrace """
+
 from __future__ import annotations
 
 # Standard Imports
@@ -19,8 +20,9 @@ from prompt_toolkit.widgets import TextArea, Frame
 
 # Logki imports
 import logki
+from logki.formulae import FormulaParser
 from logki.logic import Event, State
-from logki.utils import BufferedLog
+from logki.utils import BufferedLog, Command
 
 NS_TO_MS = 1000000
 
@@ -129,19 +131,21 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
     """
     current_state: State = State()
     current_state.init_buffer(buffered_log)
+    command_parser: FormulaParser = FormulaParser()
 
     def process_command(buff):
         try:
             current_state: State = State()
             set_status("")
-            cmd = buff.text.strip().lower()
+            inp = buff.text.strip().lower()
 
-            if cmd == "":
-                cmd = current_state.last_command
+            cmd = current_state.last_command
+            if inp != "":
+                cmd = command_parser.eval(inp)
 
-            if cmd == "help":
+            if cmd == Command.Help:
                 terminal.text = "Commands: help, next, prev"
-            elif cmd in ("next", "n", "j"):
+            elif cmd == Command.Next:
                 if (
                     current_state.buffered_log.is_at_end()
                     and current_state.current_line == current_state._buffer_size
@@ -151,7 +155,8 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
                     if current_state.real_line != 0:
                         current_state.process_event()
                     current_state.move_window_forward()
-            elif cmd in ("prev", "p", "k"):
+                current_state.last_command = Command.Next
+            elif cmd == Command.Prev:
                 if current_state.real_line == 0:
                     set_status("On the start of the file")
                 else:
@@ -161,11 +166,11 @@ def create_app(buffered_log: BufferedLog) -> Application[Any]:
                         or current_state.current_line != current_state._buffer_size
                     ):
                         current_state.undo_event()
-            elif cmd in ("quit", "exit", "q"):
+                current_state.last_command = Command.Prev
+            elif cmd == Command.Quit:
                 app.exit()
             else:
-                terminal.text = f"Unknown command: {cmd}"
-            current_state.last_command = cmd
+                set_status(f"Unknown or unsupported command: {cmd}")
             # Refresh log view to reflect changes
             log_view.content = FormattedTextControl(get_colored_log)
             buff.document = Document()  # Clear the terminal input after command execution

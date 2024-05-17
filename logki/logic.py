@@ -1,4 +1,5 @@
 """Main logic of the logki"""
+
 from __future__ import annotations
 
 
@@ -9,7 +10,7 @@ from typing import Optional
 # Third-Party Imports
 
 # Logki Imports
-from logki.utils import singleton_class, BufferedLog
+from logki.utils import singleton_class, BufferedLog, Command
 
 
 @dataclass
@@ -60,7 +61,7 @@ class State:
         self.current_line: int = 0  # Tracks the currently highlighted line
         self.real_line: int = 0
         self.buffered_log: Optional[BufferedLog] = None
-        self.last_command: str = ""
+        self.last_command: Command = Command.Next
         self.current_timestamp: int = 0
         self.first_timestamp: int = 0
         self.stack: list[str] = []
@@ -104,7 +105,10 @@ class State:
         """Moves window forward by one line"""
         assert self.buffered_log is not None
         self.real_line += 1
-        if self.current_line <= (self._buffer_size - 6) or self.get_end_of_log() in self._log_content:
+        if (
+            self.current_line <= (self._buffer_size - 6)
+            or self.get_end_of_log() in self._log_content
+        ):
             self.current_line = min(self.current_line + 1, self._buffer_size)
             return
 

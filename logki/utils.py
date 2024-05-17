@@ -1,8 +1,10 @@
 """Utilities for logki"""
+
 from __future__ import annotations
 
 # Standard Imports
 import io
+from enum import Enum
 from typing import Optional, TextIO
 
 # Third-Party Imports
@@ -79,9 +81,7 @@ class BufferedLog:
                 if len(lines) < 3:
                     continue
                 last_full_line = lines[-2]
-                self.current_position += (
-                    sum(len(line) + 1 for line in lines[:-2])
-                )
+                self.current_position += sum(len(line) + 1 for line in lines[:-2])
                 self.file.seek(self.current_position)
                 return last_full_line
         self.file.seek(self.current_position)
@@ -123,3 +123,15 @@ def singleton_class(cls):
         return instances[cls]
 
     return getinstance
+
+
+class Command(Enum):
+    Next = 0
+    Prev = 1
+    Quit = 2
+    Help = 3
+    Track = 4
+    Verify = 5
+    BreakOn = 6
+    Print = 7
+    Disprove = 8
